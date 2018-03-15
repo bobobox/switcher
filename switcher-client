@@ -1,0 +1,56 @@
+#!/usr/bin/env python3
+
+import sys
+import socket
+import argparse
+
+
+parser = argparse.ArgumentParser(description='Control Audio Switcher')
+
+parser.add_argument('action', choices=['on', 'off', 'status'],
+                    help='Action for switcher-server to take')
+parser.add_argument('--host', dest='host', default='localhost',
+                    help='Hostname or IP address of switcher-server')
+parser.add_argument('--port', dest='port', type=int, default=5555,
+                    help='TCP port of switcher-server')
+
+args = parser.parse_args()
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+sock.settimeout(4)
+
+try:
+
+    sock.connect((args.host, args.port))
+
+except socket.timeout:
+
+    print("No response from switcher-server at {}:{}.".format(
+        args.host, args.port), file=sys.stderr)
+    sys.exit(1)
+
+if args.action == 'on':
+
+    sock.sendall(b'1')
+
+elif args.action == 'off':
+
+    sock.sendall(b'0')
+
+elif args.action == 'status':
+
+
+    sock.sendall(b'S')
+    status = sock.recv(1)
+
+    if int(status) not in [0, 1]:
+
+        print('On' if int(status) else 'Off')
+
+    else:
+
+        print("Unexpected status response from switcher-server at {}:{}: '{}'".format(
+            args.host, args.port, status), file=sys.stderr)
+        sys.exit(2)
+
+sock.close()

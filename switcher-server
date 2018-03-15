@@ -31,7 +31,8 @@ def setup():
 def shutdown(red_led, green_led):
 
     green_led.off()
-    red_led.blink(on_time=0.3, off_time=0.3, fade_in_time=0.1, fade_out_time=0.1, background=True)
+    red_led.off()
+    red_led.blink(on_time=0.2, off_time=0.2, fade_in_time=0.1, fade_out_time=0.1, background=True)
     subprocess.check_call(['sudo', 'poweroff'])
 
 def set_relay(state, relay, red_led, green_led):

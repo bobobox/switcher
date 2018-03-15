@@ -23,9 +23,9 @@ try:
 
     sock.connect((args.host, args.port))
 
-except socket.timeout:
+except (socket.timeout, ConnectionRefusedError):
 
-    print("No response from switcher-server at {}:{}.".format(
+    print("Unable to connect to switcher-server at {}:{}.".format(
         args.host, args.port), file=sys.stderr)
     sys.exit(1)
 
@@ -43,7 +43,7 @@ elif args.action == 'status':
     sock.sendall(b'S')
     status = sock.recv(1)
 
-    if int(status) not in [0, 1]:
+    if int(status) in [0, 1]:
 
         print('On' if int(status) else 'Off')
 

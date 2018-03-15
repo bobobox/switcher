@@ -98,14 +98,11 @@ def handle_client(conn, relay, red_led, green_led):
         data = conn.recv(1)
 
         if not data:
-            print("Got no data")
             conn.close()
             return
         elif data == b'0':
-            print("Got relay off")
             set_relay('off', relay, red_led, green_led)
         elif data == b'1':
-            print("Got relay on")
             set_relay('on', relay, red_led, green_led)
         elif data == b'S':
             conn.sendall(b'1' if relay.is_active else b'0')

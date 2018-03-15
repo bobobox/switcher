@@ -26,7 +26,7 @@ def setup():
     # Shut down when held down for 5 seconds
     button.when_held = lambda: shutdown(red_led, green_led)
 
-    return (relay, red_led, green_led, button)
+    return (relay, red_led, green_led)
 
 def shutdown(red_led, green_led):
 
@@ -116,7 +116,7 @@ def handle_client(conn, relay, red_led, green_led):
 
 def main():
 
-    (relay, red_led, green_led, button) = setup()
+    (relay, red_led, green_led) = setup()
 
     run_server(relay, red_led, green_led, SERVER_LISTEN_PORT)
 

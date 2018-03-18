@@ -1,0 +1,11 @@
+[Unit]
+Description=Runs Switcher Server Script for Audio Switching
+
+[Service]
+Type=simple
+ExecStart=/usr/sbin/switcher-server
+
+[Install]
+WantedBy=multi-user.target
+
+

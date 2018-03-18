@@ -7,7 +7,7 @@ import argparse
 
 parser = argparse.ArgumentParser(description='Control Audio Switcher')
 
-parser.add_argument('action', choices=['on', 'off', 'status'],
+parser.add_argument('action', choices=['on', 'off', 'state'],
                     help='Action for switcher-server to take')
 parser.add_argument('--host', dest='host', default='localhost',
                     help='Hostname or IP address of switcher-server')
@@ -19,6 +19,8 @@ args = parser.parse_args()
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.settimeout(4)
 
+return_code = 0
+
 try:
 
     sock.connect((args.host, args.port))
@@ -27,6 +29,7 @@ except (socket.timeout, ConnectionRefusedError):
 
     print("Unable to connect to switcher-server at {}:{}.".format(
         args.host, args.port), file=sys.stderr)
+    sock.close()
     sys.exit(1)
 
 if args.action == 'on':
@@ -37,20 +40,26 @@ elif args.action == 'off':
 
     sock.sendall(b'0')
 
-elif args.action == 'status':
+elif args.action == 'state':
 
 
     sock.sendall(b'S')
-    status = sock.recv(1)
+    state = sock.recv(1)
 
-    if int(status) in [0, 1]:
+    if int(state) == 0:
 
-        print('On' if int(status) else 'Off')
+        print('On')
+        return_code = 1 # Some modules like homebridge-cmdswitch2 use return code for switch state.
+
+    elif int(state) == 1:
+
+        print('On')
 
     else:
 
-        print("Unexpected status response from switcher-server at {}:{}: '{}'".format(
-            args.host, args.port, status), file=sys.stderr)
-        sys.exit(2)
+        print("Unexpected state response from switcher-server at {}:{}: '{}'".format(
+            args.host, args.port, state), file=sys.stderr)
+        return_code = 2
 
 sock.close()
+sys.exit(return_code)
